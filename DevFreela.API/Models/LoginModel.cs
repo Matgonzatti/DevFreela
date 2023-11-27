@@ -1,0 +1,8 @@
+namespace DevFreela.API.Models
+{
+    public class LoginModel
+    {
+        public string UserName { get; set; } = string.Empty;
+        public string PassWord { get; set; } = string.Empty;
+    }
+}
