@@ -26,7 +26,7 @@ public class Project : BaseEntity
     public decimal TotalCost { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public DateTime? StartedAt { get; private set; }
-    public DateTime FinishedAt { get; private set; }
+    public DateTime? FinishedAt { get; private set; }
     public ProjectStatusEnum Status { get; private set; }
     public List<ProjectComments> Comments { get; private set; }
 
@@ -42,8 +42,13 @@ public class Project : BaseEntity
         }
     }
 
+    public void SetPaymentPending()
+    {
+        Status = ProjectStatusEnum.PendingPayment;
+    }
+
     public void Finish() {
-        if (Status == ProjectStatusEnum.InProgress) {
+        if (Status == ProjectStatusEnum.PendingPayment) {
             Status = ProjectStatusEnum.Finished;
             FinishedAt = DateTime.Now;
         }
