@@ -1,11 +1,13 @@
 using DevFreela.Core.Entities;
 using DevFreela.Core.Repositories;
+using DevFreela.Infrastructure.Persistence.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace DevFreela.Infrastructure.Persistence.Repositories;
 
 public class ProjectRepository : IProjectRepository
 {
+    private const int PAGE_SIZE = 20;
     private readonly DevFreelaDbContext _dbContext;
 
     public ProjectRepository(DevFreelaDbContext dbContext)
@@ -13,7 +15,16 @@ public class ProjectRepository : IProjectRepository
         _dbContext = dbContext;
     }
 
-    public async Task<List<Project>> GetAllAsync() => await _dbContext.Projects.ToListAsync();
+    public async Task<PaginationResult<Project>> GetAllAsync(string query, int page)
+    {
+        IQueryable<Project> projects = _dbContext.Projects;
+
+        if (!string.IsNullOrEmpty(query))
+            projects = projects
+                .Where(p => p.Title.Contains(query) || p.Description.Contains(query));
+
+        return await projects.GetPaged(page, PAGE_SIZE);
+    }
 
     public async Task<Project> GetByIdAsync(Guid id)
     {   
@@ -30,7 +41,6 @@ public class ProjectRepository : IProjectRepository
     public async Task<Guid> AddAsync(Project project)
     {
         await _dbContext.Projects.AddAsync(project);
-        await _dbContext.SaveChangesAsync();
 
         return project.Id;
     }

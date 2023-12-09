@@ -23,18 +23,16 @@ public class ProjectsController : ControllerBase
     }
 
     [HttpGet]
-    [Authorize(Roles = "client, freelancer, admin")]
-    public async Task<IActionResult> Get(string query)
+    //[Authorize(Roles = "client, freelancer, admin")]
+    public async Task<IActionResult> Get(GetAllProjectsQuery getAllProjectsQuery)
     {
-        var projectsQuery = new GetAllProjectsQuery(query);
-
-        var projects = await _mediator.Send(projectsQuery);
+        var projects = await _mediator.Send(getAllProjectsQuery);
 
         return Ok(projects);
     }
 
     [HttpGet("{id}")]
-    [Authorize(Roles = "client, freelancer, admin")]
+    //[Authorize(Roles = "client, freelancer, admin")]
     public async Task<IActionResult> GetById(Guid id)
     {
         var query = new GetProjectByIdQuery(id);
@@ -48,7 +46,7 @@ public class ProjectsController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = "client, admin")]
+    //[Authorize(Roles = "client, admin")]
     public async Task<IActionResult> Post([FromBody] CreateProjectCommand command)
     {
         var id = await _mediator.Send(command);
@@ -57,7 +55,7 @@ public class ProjectsController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    [Authorize(Roles = "client, admin")]
+    //[Authorize(Roles = "client, admin")]
     public async Task<IActionResult> Put(int id, [FromBody] UpdateProjectCommand command)
     {
         await _mediator.Send(command);
@@ -77,7 +75,7 @@ public class ProjectsController : ControllerBase
     }
 
     [HttpPost("{id}/comments")]
-    [Authorize(Roles = "client, freelancer, admin")]
+    //[Authorize(Roles = "client, freelancer, admin")]
     public async Task<IActionResult> PostComments(Guid id, [FromBody] CreateCommentsCommand command)
     {
         await _mediator.Send(command);
@@ -86,7 +84,7 @@ public class ProjectsController : ControllerBase
     }
 
     [HttpPut("{id}/start")]
-    [Authorize(Roles = "client, admin")]
+    //[Authorize(Roles = "client, admin")]
     public async Task<IActionResult> Start(Guid id)
     {
         var command = new StartProjectCommand(id);
@@ -97,7 +95,7 @@ public class ProjectsController : ControllerBase
     }
 
     [HttpPut("{id}/finish")]
-    [Authorize(Roles = "client, admin")]
+    //[Authorize(Roles = "client, admin")]
     public async Task<IActionResult> Finish([FromBody] FinishProjectCommand command)
     {
         await _mediator.Send(command);

@@ -1,26 +1,34 @@
 using DevFreela.Core.Entities;
-using DevFreela.Core.Repositories;
+using DevFreela.Infrastructure.Persistence;
 using MediatR;
 
 namespace DevFreela.Application.Commands.CreateProject;
 
 public class CreateProjectCommandHandler : IRequestHandler<CreateProjectCommand, Guid>
 {
-    private readonly IProjectRepository _projectRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public CreateProjectCommandHandler(IProjectRepository projectRepository)
+    public CreateProjectCommandHandler(IUnitOfWork unitOfWork)
     {
-        _projectRepository = projectRepository;
-
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Guid> Handle(CreateProjectCommand request, CancellationToken cancellationToken)
     {
-        var project = new Project(request.Title, request.Description, request.IdClient, request.IdFreelancer, request.TotalCost);   
-        
-        await _projectRepository.AddAsync(project);
+        var project = new Project(request.Title, request.Description, request.IdClient, request.IdFreelancer, request.TotalCost);
+
+        await _unitOfWork.BeginTransactionAsync();
+
+        await _unitOfWork.Projects.AddAsync(project);
+
+        await _unitOfWork.CompleteAsync();
+
+        await _unitOfWork.Skills.AddSkillFromProject(project);
+
+        await _unitOfWork.CompleteAsync();
+
+        await _unitOfWork.CommitAsync();
 
         return project.Id;
     }
-
 }
